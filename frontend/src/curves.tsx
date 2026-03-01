@@ -183,9 +183,10 @@ export function ChartAreaInteractive() {
                     minTickGap={32}
                     tickFormatter={(value) => {
                         const date = new Date(value)
-                        return date.toLocaleDateString("en-US", {
+                        return date.toLocaleDateString("fr-FR", {
                         month: "short",
                         day: "numeric",
+                        timeZone: "Europe/Paris",
                         })
                     }}
                 />
