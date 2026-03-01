@@ -40,7 +40,7 @@ app.get('/api/data/real', async (req, res) => {
     if (start && end) {
       query = `
         SELECT 
-          (timestamp AT TIME ZONE 'UTC' AT TIME ZONE 'Europe/Paris') AS date, 
+          timestamp AS date, 
           value AS "true value",
           'RTE' AS source
         FROM historical_data
@@ -57,7 +57,7 @@ app.get('/api/data/real', async (req, res) => {
 
       query = `
         SELECT 
-          (timestamp AT TIME ZONE 'UTC' AT TIME ZONE 'Europe/Paris') AS date,
+          timestamp AS date,
           value AS "true value",
           'RTE' AS source
         FROM historical_data
@@ -86,7 +86,7 @@ app.get('/api/data/predictions', async (req, res) => {
     if (start && end) {
       query = `
         SELECT 
-          (timestamp AT TIME ZONE 'UTC' AT TIME ZONE 'Europe/Paris') AS date,
+          timestamp AS date,
           predicted_value AS "our forecast",
           model_name AS model
         FROM predictions
@@ -103,7 +103,7 @@ app.get('/api/data/predictions', async (req, res) => {
 
       query = `
         SELECT 
-          (timestamp AT TIME ZONE 'UTC' AT TIME ZONE 'Europe/Paris') AS date,
+          timestamp AS date,
           predicted_value AS "our forecast",
           model_name AS model
         FROM predictions
@@ -132,7 +132,7 @@ app.get('/api/data/rte-forecasts', async (req, res) => {
     if (start && end) {
       query = `
         SELECT 
-          (timestamp AT TIME ZONE 'UTC' AT TIME ZONE 'Europe/Paris') AS date,
+          timestamp AS date,
           forecast_value AS "rte forecast",
           'RTE' AS source
         FROM rte_forecasts
@@ -149,7 +149,7 @@ app.get('/api/data/rte-forecasts', async (req, res) => {
 
       query = `
         SELECT 
-          (timestamp AT TIME ZONE 'UTC' AT TIME ZONE 'Europe/Paris') AS date,
+          timestamp AS date,
           forecast_value AS "rte forecast",
           'RTE' AS source
         FROM rte_forecasts
@@ -178,7 +178,7 @@ app.get('/api/data', async (req, res) => {
     // Données réelles
     const realResult = await pool.query(`
       SELECT 
-        (timestamp AT TIME ZONE 'UTC' AT TIME ZONE 'Europe/Paris') AS date,
+        timestamp AS date,
         value AS "true value"
       FROM historical_data
       WHERE timestamp >= NOW() - INTERVAL '${daysToSubtract} days'
@@ -188,7 +188,7 @@ app.get('/api/data', async (req, res) => {
     // Prédictions Chronos
     const predResult = await pool.query(`
       SELECT 
-        (timestamp AT TIME ZONE 'UTC' AT TIME ZONE 'Europe/Paris') AS date,
+        timestamp AS date,
         predicted_value AS "our forecast"
       FROM predictions
       WHERE timestamp >= NOW() - INTERVAL '${daysToSubtract} days'
@@ -198,7 +198,7 @@ app.get('/api/data', async (req, res) => {
     // Prévisions RTE
     const rteResult = await pool.query(`
       SELECT 
-        (timestamp AT TIME ZONE 'UTC' AT TIME ZONE 'Europe/Paris') AS date,
+        timestamp AS date,
         forecast_value AS "rte forecast"
       FROM rte_forecasts
       WHERE timestamp >= NOW() - INTERVAL '${daysToSubtract} days'
