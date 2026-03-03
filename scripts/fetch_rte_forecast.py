@@ -5,6 +5,7 @@ import psycopg2
 from dotenv import load_dotenv
 from datetime import datetime, timedelta
 import logging
+import time
 
 # ─── Configuration du logging ────────────────────────────────────────────────
 logging.basicConfig(
@@ -151,16 +152,28 @@ def insert_into_db(df):
 def main():
     print("\n\n\n")
     logger.info("═══ Démarrage récupération prévisions RTE D-1 ═══")
-    try:
-        token                       = get_rte_token()
-        all_start_dates, all_values = fetch_rte_forecast(token)
-        df                          = clean_data(all_start_dates, all_values)
-        insert_into_db(df)
-        logger.info("═══ Pipeline terminé avec succès ═══")
-    except Exception as e:
-        logger.error(f"Erreur critique : {e}")
 
-    print("\n")
+    MAX_RETRIES = 3
+    RETRY_DELAY = 30 * 60  # 30 minutes
+
+    for attempt in range(1, MAX_RETRIES + 1):
+        try:
+            logger.info(f"Tentative {attempt}/{MAX_RETRIES}...")
+            token                       = get_rte_token()
+            all_start_dates, all_values = fetch_rte_forecast(token)
+            df                          = clean_data(all_start_dates, all_values)
+            if df.empty:
+                raise ValueError("Aucune donnée récupérée depuis RTE.")
+            insert_into_db(df)
+            logger.info("═══ Pipeline terminé avec succès ═══")
+            return
+        except Exception as e:
+            logger.error(f"Erreur tentative {attempt}/{MAX_RETRIES} : {e}")
+            if attempt < MAX_RETRIES:
+                logger.info("⏳ Nouvelle tentative dans 30 minutes...")
+                time.sleep(RETRY_DELAY)
+            else:
+                logger.error("✗ Toutes les tentatives ont échoué.")
 
 if __name__ == "__main__":
     main()
